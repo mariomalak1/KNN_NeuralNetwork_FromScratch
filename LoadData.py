@@ -32,26 +32,4 @@ class LoadData:
             print(f"Error reading CSV file: {e}")
             return []
 
-
-    def partition(self, train_size=0.8):
-        # if the user will take 100% from reading the data
-        if self.percentage_num_of_rows == 1:
-            train_end = 280
-
-            train_data = self.data.iloc[:train_end].reset_index(drop=True)
-            test_data = self.data.iloc[train_end:].reset_index(drop=True)
-
-        else:
-            train_end = int(len(self.data) * train_size)
-
-            train_data = self.data.iloc[:train_end].reset_index(drop=True)
-            test_data = self.data.iloc[train_end:].reset_index(drop=True)
-
-        # Last column is the label
-        y_train = train_data.iloc[:, -1]
-        x_train = train_data.iloc[:, :-1]
-
-        y_test = test_data.iloc[:, -1]
-        x_test = test_data.iloc[:, :-1]
-
-        return x_train, y_train, x_test, y_test
+    
