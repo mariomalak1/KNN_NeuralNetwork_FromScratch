@@ -24,5 +24,4 @@ class KNN:
             predictions.append(prediction)
         return np.array(predictions)
 
-    def score(self, predictions, y):
-        return np.mean(predictions == y)    
+ 
