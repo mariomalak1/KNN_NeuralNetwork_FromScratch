@@ -37,7 +37,7 @@ class ANN_KNN_GUI:
 
         # Default value for file location (can be customized)
         self.entry_file_location = tk.Entry(self.root)
-        self.entry_file_location.insert(0, "data.csv")  # Default file path
+        self.entry_file_location.insert(0, "../Kidney_Disease_data_for_Classification_V2.csv")  # Default file path
         self.entry_file_location.grid(row=2, column=1, padx=10, pady=10)
         
         # Browse Button for file location

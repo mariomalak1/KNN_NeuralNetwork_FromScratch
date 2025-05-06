@@ -5,8 +5,9 @@ from knn import KNN
 from NeuralNetwork import NeuralNetwork
 from Evaluation import Evaluation
 
+import numpy as np
 
-def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=3, learning_rate=0.005, hidden_layers=2):
+def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=3, learning_rate=0.005, hidden_layers=3, thresholdAccuracy=90, newDataEntered=None):
     loadData = LoadData(fileName, percentageOfRowsToRead)
     df = loadData.loadData()
 
@@ -50,6 +51,26 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=
     ann_accuracy = Evaluation.accuracy(predictions, y_test)
     print(f"ANN - Accuracy: {ann_accuracy * 100}%")
 
-    return knn_accuracy, ann_accuracy 
+    # predict new data that entered by user
 
+    newDataPredict = None
 
+    if newDataEntered:
+
+        newDataEntered = np.array(newDataEntered)
+
+        if(knn_accuracy < thresholdAccuracy and ann_accuracy < thresholdAccuracy):
+            newDataPredict = nn.predict(newDataEntered)
+        elif (knn_accuracy < thresholdAccuracy):
+            newDataPredict = nn.predict(newDataEntered)
+        elif (ann_accuracy < thresholdAccuracy):
+            newDataPredict = knn.predict(newDataEntered)
+        else:
+            newDataPredict = nn.predict(newDataEntered)
+
+        if newDataPredict == 0:
+            newDataPredict = "notckd"
+        elif newDataPredict == 1:
+            newDataPredict = "ckd"
+
+    return knn_accuracy, ann_accuracy, newDataPredict
