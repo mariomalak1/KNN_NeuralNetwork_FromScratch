@@ -56,21 +56,25 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=
     newDataPredict = None
 
     if newDataEntered:
+        isAllDataEntered = True
+        for i in newDataEntered:
+            if not i:
+                isAllDataEntered = False
+        if isAllDataEntered:
+            newDataEntered = np.array(newDataEntered)
 
-        newDataEntered = np.array(newDataEntered)
+            if(knn_accuracy < thresholdAccuracy and ann_accuracy < thresholdAccuracy):
+                newDataPredict = nn.predict(newDataEntered)
+            elif (knn_accuracy < thresholdAccuracy):
+                newDataPredict = nn.predict(newDataEntered)
+            elif (ann_accuracy < thresholdAccuracy):
+                newDataPredict = knn.predict(newDataEntered)
+            else:
+                newDataPredict = nn.predict(newDataEntered)
 
-        if(knn_accuracy < thresholdAccuracy and ann_accuracy < thresholdAccuracy):
-            newDataPredict = nn.predict(newDataEntered)
-        elif (knn_accuracy < thresholdAccuracy):
-            newDataPredict = nn.predict(newDataEntered)
-        elif (ann_accuracy < thresholdAccuracy):
-            newDataPredict = knn.predict(newDataEntered)
-        else:
-            newDataPredict = nn.predict(newDataEntered)
-
-        if newDataPredict == 0:
-            newDataPredict = "notckd"
-        elif newDataPredict == 1:
-            newDataPredict = "ckd"
+            if newDataPredict == 0:
+                newDataPredict = "notckd"
+            elif newDataPredict == 1:
+                newDataPredict = "ckd"
 
     return knn_accuracy, ann_accuracy, newDataPredict
