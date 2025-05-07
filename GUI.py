@@ -19,7 +19,7 @@ class ANN_KNN_GUI:
         
         # Default value for percentage
         self.entry_percentage = tk.Entry(self.root)
-        self.entry_percentage.insert(0, "80")  # Default percentage
+        self.entry_percentage.insert(0, "100")
         self.entry_percentage.grid(row=0, column=1, padx=10, pady=10)
         
         # Label for train data size
@@ -28,14 +28,13 @@ class ANN_KNN_GUI:
         
         # Default value for train size
         self.entry_train_size = tk.Entry(self.root)
-        self.entry_train_size.insert(0, "70")  # Default train size
+        self.entry_train_size.insert(0, "70")
         self.entry_train_size.grid(row=1, column=1, padx=10, pady=10)
 
         # Label for file location
         self.label_file_location = tk.Label(self.root, text="File Location (CSV/Excel):")
         self.label_file_location.grid(row=2, column=0, padx=10, pady=10)
 
-        # Default value for file location (can be customized)
         self.entry_file_location = tk.Entry(self.root)
         self.entry_file_location.insert(0, "../Kidney_Disease_data_for_Classification_V2.csv")
         self.entry_file_location.grid(row=2, column=1, padx=10, pady=10)
@@ -44,22 +43,20 @@ class ANN_KNN_GUI:
         self.button_browse = tk.Button(self.root, text="Browse", command=self.browse_file)
         self.button_browse.grid(row=2, column=2, padx=10, pady=10)
 
-        # Label for KNN's k value
+        # Label for KNN k value
         self.label_knn_k = tk.Label(self.root, text="KNN - k Value:")
         self.label_knn_k.grid(row=3, column=0, padx=10, pady=10)
         
-        # Default value for KNN's k
         self.entry_knn_k = tk.Entry(self.root)
-        self.entry_knn_k.insert(0, "5")  # Default k value
+        self.entry_knn_k.insert(0, "3")
         self.entry_knn_k.grid(row=3, column=1, padx=10, pady=10)
         
         # Label for learning rate
         self.label_learning_rate = tk.Label(self.root, text="Learning Rate:")
         self.label_learning_rate.grid(row=4, column=0, padx=10, pady=10)
         
-        # Default value for learning rate
         self.entry_learning_rate = tk.Entry(self.root)
-        self.entry_learning_rate.insert(0, "0.05")  # Default learning rate
+        self.entry_learning_rate.insert(0, "0.05")
         self.entry_learning_rate.grid(row=4, column=1, padx=10, pady=10)
         
         # Button to run evaluation
@@ -85,7 +82,6 @@ class ANN_KNN_GUI:
         self.entry_file_location.insert(0, file_path)
 
     def run_evaluation(self):
-        # Get user inputs
         try:
             percentage = float(self.entry_percentage.get())
             train_size = float(self.entry_train_size.get())
@@ -99,7 +95,6 @@ class ANN_KNN_GUI:
             if not os.path.exists(file_location):
                 raise ValueError("File path does not exist.")
 
-            # Call preprocessing function for evaluation
             result = preprocessing(file_location, percentage, train_size, knn_k, learning_rate)
 
             if result:
