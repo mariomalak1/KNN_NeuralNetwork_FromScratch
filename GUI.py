@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
+import numpy as np
+
 from preprocessing import preprocessing
 
 class ANN_KNN_GUI:
@@ -55,13 +57,6 @@ class ANN_KNN_GUI:
         self.entry_knn_k.insert(0, "3")
         self.entry_knn_k.grid(row=3, column=1, padx=10, pady=10)
         
-        self.label_learning_rate = tk.Label(self.main_tab, text="Learning Rate:")
-        self.label_learning_rate.grid(row=4, column=0, padx=10, pady=10)
-        
-        self.entry_learning_rate = tk.Entry(self.main_tab)
-        self.entry_learning_rate.insert(0, "0.05")
-        self.entry_learning_rate.grid(row=4, column=1, padx=10, pady=10)
-        
         self.button_run = tk.Button(self.main_tab, text="Run Evaluation", command=self.run_evaluation)
         self.button_run.grid(row=5, column=0, columnspan=3, pady=10)
         
@@ -76,6 +71,7 @@ class ANN_KNN_GUI:
         
         self.ann_accuracy = tk.Label(self.main_tab, text="Not Evaluated")
         self.ann_accuracy.grid(row=7, column=1, padx=10, pady=10)
+        
 
     def browse_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv"), ("Excel Files", "*.xlsx")])
@@ -88,19 +84,19 @@ class ANN_KNN_GUI:
             train_size = float(self.entry_train_size.get())
             file_location = self.entry_file_location.get()
             knn_k = int(self.entry_knn_k.get())
-            learning_rate = float(self.entry_learning_rate.get())
 
             if not (0 < percentage <= 100 and 0 < train_size <= 100):
                 raise ValueError("Percentage and Train Size should be between 0 and 100.")
             if not os.path.exists(file_location):
                 raise ValueError("File path does not exist.")
 
-            result = preprocessing(file_location, percentage, train_size, knn_k, learning_rate)
+            result = preprocessing(file_location, percentage, train_size, knn_k)
 
             if result:
-                knn_acc, ann_acc, knn_records, ann_records = result
+                knn_acc, ann_acc, knn_records, ann_records, real_records = result
                 self.knn_accuracy.config(text=f"{knn_acc * 100:.2f}%")
                 self.ann_accuracy.config(text=f"{ann_acc * 100:.2f}%")
+                self.display_prediction_counts(knn_records, ann_records, real_records)
                 self.populate_table(self.knn_table, knn_records)
                 self.populate_table(self.ann_table, ann_records)
             else:
@@ -164,6 +160,42 @@ class ANN_KNN_GUI:
             else:
                 values = row
             tree.insert("", "end", values=values)
+
+    def display_prediction_counts(self, knn_records, ann_records, real_records):
+        # Create a frame for the statistics
+        stats_frame = ttk.Frame(self.main_tab)
+        stats_frame.grid(row=8, column=0, columnspan=3, pady=10, sticky="w")
+        
+        # Clear previous stats if they exist
+        for widget in stats_frame.winfo_children():
+            widget.destroy()
+        
+        # Calculate KNN counts
+        knn_predicted = [row[-2] for row in knn_records[1:]]
+        knn_ckd = knn_predicted.count("ckd")
+        knn_notckd = knn_predicted.count("notckd")
+        
+        # Calculate ANN counts
+        ann_predicted = [row[-2] for row in ann_records[1:]]
+        ann_ckd = ann_predicted.count("ckd")
+        ann_notckd = ann_predicted.count("notckd")
+
+        real_ckd = np.sum(real_records == "ckd")
+        real_notckd = np.sum(real_records == "notckd")
+
+        # Create labels for KNN stats
+        ttk.Label(stats_frame, text="KNN Predictions:", font=('Arial', 10, 'bold')).grid(row=0, column=0, sticky="w")
+        ttk.Label(stats_frame, text=f"ckd: {knn_ckd}").grid(row=0, column=1, padx=10, sticky="w")
+        ttk.Label(stats_frame, text=f"notckd: {knn_notckd}").grid(row=0, column=2, padx=10, sticky="w")
+        
+        # Create labels for ANN stats
+        ttk.Label(stats_frame, text="ANN Predictions:", font=('Arial', 10, 'bold')).grid(row=1, column=0, sticky="w")
+        ttk.Label(stats_frame, text=f"ckd: {ann_ckd}").grid(row=1, column=1, padx=10, sticky="w")
+        ttk.Label(stats_frame, text=f"notckd: {ann_notckd}").grid(row=1, column=2, padx=10, sticky="w")
+
+        ttk.Label(stats_frame, text="Real Data:", font=('Arial', 10, 'bold')).grid(row=2, column=0, sticky="w")
+        ttk.Label(stats_frame, text=f"ckd: {real_ckd}").grid(row=2, column=1, padx=10, sticky="w")
+        ttk.Label(stats_frame, text=f"notckd: {real_notckd}").grid(row=2, column=2, padx=10, sticky="w")
 
 
 # Run the GUI
