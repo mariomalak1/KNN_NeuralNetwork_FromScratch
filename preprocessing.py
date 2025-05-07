@@ -4,6 +4,7 @@ from Normalization import Normalization
 from knn import KNN
 from NeuralNetwork import NeuralNetwork
 from Evaluation import Evaluation
+from testingDataWithPrediction import * 
 
 import numpy as np
 
@@ -29,7 +30,6 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=
     
     partitioning = Partitioning(normalization.df)
 
-
     x_train, y_train, x_test, y_test = partitioning.split(train_size=train_set_size)
     
     ## KNN
@@ -45,25 +45,33 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=
             knn.fit(x_train.to_numpy(), y_train.to_numpy())
             
             # Make predictions
-            predictions = knn.predict(x_test.to_numpy())
+            knn_predictions = knn.predict(x_test.to_numpy())
 
             # Test with known labels (for accuracy calculation)
-            knn_accuracy = Evaluation.accuracy(predictions, y_test)
+            knn_accuracy = Evaluation.accuracy(knn_predictions, y_test)            
+
             print(f"training Number {trainingCounter} for KNN - Accuracy: {knn_accuracy * 100}%")
+
 
         if ann_accuracy < thresholdAccuracy:
             ## ANN
             nn = NeuralNetwork(input_size=x_train.shape[1], hidden_size=hidden_layers, output_size=1, learning_rate=learning_rate)
             nn.train(x_train.to_numpy(), y_train.to_numpy(), epochs=1000)
 
-            predictions = nn.predict(x_test.to_numpy())
+            ann_predictions = nn.predict(x_test.to_numpy())
 
             # Test with known labels (for accuracy calculation)
-            ann_accuracy = Evaluation.accuracy(predictions, y_test)
+            ann_accuracy = Evaluation.accuracy(ann_predictions, y_test)
             print(f"training Number {trainingCounter} for ANN - Accuracy: {ann_accuracy * 100}%")
+
 
         # force stop condition 
         if trainingCounter > 30:
             break
 
-    return knn_accuracy, ann_accuracy
+    knn_predicted_rows = testingDataWithPrediction(knn_predictions, x_test, y_test)
+    
+    ann_predictions_rows = testingDataWithPrediction(ann_predictions, x_test, y_test)
+
+
+    return knn_accuracy, ann_accuracy, knn_predicted_rows, ann_predictions_rows
