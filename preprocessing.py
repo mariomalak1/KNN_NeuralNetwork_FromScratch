@@ -7,7 +7,7 @@ from Evaluation import Evaluation
 
 import numpy as np
 
-def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=3, learning_rate=0.005, hidden_layers=3, thresholdAccuracy=80):
+def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=3, learning_rate=0.005, hidden_layers=3, thresholdAccuracy=0.8):
     loadData = LoadData(fileName, percentageOfRowsToRead)
     df = loadData.loadData()
 
