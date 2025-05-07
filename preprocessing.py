@@ -48,7 +48,7 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=
             knn_predictions = knn.predict(x_test.to_numpy())
 
             # Test with known labels (for accuracy calculation)
-            knn_accuracy = Evaluation.accuracy(knn_predictions, y_test)            
+            knn_accuracy = Evaluation.accuracy(knn_predictions, y_test.to_numpy())            
 
             print(f"training Number {trainingCounter} for KNN - Accuracy: {knn_accuracy * 100}%")
 
@@ -60,8 +60,8 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=
 
             ann_predictions = nn.predict(x_test.to_numpy())
 
-            # Test with known labels (for accuracy calculation)
-            ann_accuracy = Evaluation.accuracy(ann_predictions, y_test)
+            ann_accuracy = Evaluation.accuracy(ann_predictions, y_test.to_numpy())
+
             print(f"training Number {trainingCounter} for ANN - Accuracy: {ann_accuracy * 100}%")
 
 
@@ -69,9 +69,13 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=
         if trainingCounter > 30:
             break
 
+
     knn_predicted_rows = testingDataWithPrediction(knn_predictions, x_test, y_test)
     
     ann_predictions_rows = testingDataWithPrediction(ann_predictions, x_test, y_test)
 
+    real_records = y_test.map({0.0: "ckd", 1.0: "notckd"})
 
-    return knn_accuracy, ann_accuracy, knn_predicted_rows, ann_predictions_rows
+    real_records = real_records.to_numpy()
+
+    return knn_accuracy, ann_accuracy, knn_predicted_rows, ann_predictions_rows, real_records
