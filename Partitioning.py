@@ -4,14 +4,18 @@ class Partitioning:
 
     def split(self, train_size=80):
         if not 0 < train_size < 100:
-            raise ValueError("train_size must be a float between 0 and 1")
-        else:
-            train_size /= 100
+            raise ValueError("train_size must be a float between 0 and 100")
 
-        train_end = int(len(self.data) * train_size)
+        # Shuffle the dataset randomly
+        shuffled_data = self.data.sample(frac=1, random_state=42).reset_index(drop=True)
 
-        train_data = self.data.iloc[:train_end].reset_index(drop=True)
-        test_data = self.data.iloc[train_end:].reset_index(drop=True)
+        # Convert percentage to proportion
+        train_size /= 100
+
+        train_end = int(len(shuffled_data) * train_size)
+
+        train_data = shuffled_data.iloc[:train_end]
+        test_data = shuffled_data.iloc[train_end:]
 
         # Last column is the label
         y_train = train_data.iloc[:, -1]
