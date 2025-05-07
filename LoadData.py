@@ -25,7 +25,7 @@ class LoadData:
 
     def loadData(self):
         try:
-            self.data = pd.read_csv(self.file_path, nrows=self.numOfRows)           
+            self.data = pd.read_csv(self.file_path, nrows=self.numOfRows)
             return self.data
             
         except Exception as e:
