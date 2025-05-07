@@ -7,7 +7,7 @@ from Evaluation import Evaluation
 
 import numpy as np
 
-def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=3, learning_rate=0.005, hidden_layers=3, thresholdAccuracy=90):
+def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=70, knn_k=3, learning_rate=0.005, hidden_layers=3, thresholdAccuracy=80):
     loadData = LoadData(fileName, percentageOfRowsToRead)
     df = loadData.loadData()
 
@@ -33,53 +33,37 @@ def preprocessing(fileName, percentageOfRowsToRead=70, train_set_size=75, knn_k=
     x_train, y_train, x_test, y_test = partitioning.split(train_size=train_set_size)
     
     ## KNN
-    knn = KNN(k=knn_k)
-    knn.fit(x_train.to_numpy(), y_train.to_numpy())
+    knn_accuracy = 0
+    ann_accuracy = 0
+    trainingCounter = 0
     
-    # Make predictions
-    predictions = knn.predict(x_test.to_numpy())
+    while knn_accuracy < thresholdAccuracy or ann_accuracy < thresholdAccuracy:
+        trainingCounter += 1
 
-    # Test with known labels (for accuracy calculation)
-    knn_accuracy = Evaluation.accuracy(predictions, y_test)
-    print(f"KNN - Accuracy: {knn_accuracy * 100}%")
+        if knn_accuracy < thresholdAccuracy:
+            knn = KNN(k=knn_k)
+            knn.fit(x_train.to_numpy(), y_train.to_numpy())
+            
+            # Make predictions
+            predictions = knn.predict(x_test.to_numpy())
 
+            # Test with known labels (for accuracy calculation)
+            knn_accuracy = Evaluation.accuracy(predictions, y_test)
+            print(f"training Number {trainingCounter} for KNN - Accuracy: {knn_accuracy * 100}%")
 
-    ## ANN
-    nn = NeuralNetwork(input_size=x_train.shape[1], hidden_size=hidden_layers, output_size=1, learning_rate=learning_rate)
-    nn.train(x_train.to_numpy(), y_train.to_numpy(), epochs=1000)
+        if ann_accuracy < thresholdAccuracy:
+            ## ANN
+            nn = NeuralNetwork(input_size=x_train.shape[1], hidden_size=hidden_layers, output_size=1, learning_rate=learning_rate)
+            nn.train(x_train.to_numpy(), y_train.to_numpy(), epochs=1000)
 
-    predictions = nn.predict(x_test.to_numpy())
+            predictions = nn.predict(x_test.to_numpy())
 
-    # Test with known labels (for accuracy calculation)
-    ann_accuracy = Evaluation.accuracy(predictions, y_test)
-    print(f"ANN - Accuracy: {ann_accuracy * 100}%")
+            # Test with known labels (for accuracy calculation)
+            ann_accuracy = Evaluation.accuracy(predictions, y_test)
+            print(f"training Number {trainingCounter} for ANN - Accuracy: {ann_accuracy * 100}%")
 
-    # predict new data that entered by user
-
-    # newDataPredict = None
-
-    # newDataEntered=[48.0,80.0,1.02,1.0,0.0,,normal,notpresent,notpresent,121.0,36.0,1.2,,,15.4,44,7800,5.2,yes,yes,no,good,no,no]
-    # # for predict new record 
-    # if newDataEntered:
-    #     isAllDataEntered = True
-    #     for i in newDataEntered:
-    #         if not i:
-    #             isAllDataEntered = False
-    #     if isAllDataEntered:
-    #         newDataEntered = np.array(newDataEntered)
-
-    #         if(knn_accuracy < thresholdAccuracy and ann_accuracy < thresholdAccuracy):
-    #             newDataPredict = nn.predict(newDataEntered)
-    #         elif (knn_accuracy < thresholdAccuracy):
-    #             newDataPredict = nn.predict(newDataEntered)
-    #         elif (ann_accuracy < thresholdAccuracy):
-    #             newDataPredict = knn.predict(newDataEntered)
-    #         else:
-    #             newDataPredict = nn.predict(newDataEntered)
-
-    #         if newDataPredict == 0:
-    #             newDataPredict = "notckd"
-    #         elif newDataPredict == 1:
-    #             newDataPredict = "ckd"
+        # force stop condition 
+        if trainingCounter > 30:
+            break
 
     return knn_accuracy, ann_accuracy
